@@ -29,8 +29,11 @@ class Post(models.Model):
         related_name='posts', blank=True, null=True
     )
 
+    class Meta:
+        ordering = ('pub_date',)
+
     def __str__(self):
-        return self.text
+        return self.text[:15]
 
 
 class Comment(models.Model):
@@ -44,3 +47,33 @@ class Comment(models.Model):
     created = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
     )
+
+
+# ОБЯЗАТЕЛЬНО ПО ТЗ: Новая модель подписок
+class Follow(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='follower',  # Кто подписывается
+        verbose_name='Подписчик'
+    )
+    following = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='following',  # На кого подписываются
+        verbose_name='Автор'
+    )
+
+    class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+        # РЕКОМЕНДАЦИЯ ИЗ ТЗ: Используем UniqueConstraint вместо устаревшего unique_together
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'following'],
+                name='unique_user_following'
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.user.username} подписан на {self.following.username}'
