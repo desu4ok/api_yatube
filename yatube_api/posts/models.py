@@ -49,25 +49,23 @@ class Comment(models.Model):
     )
 
 
-# ОБЯЗАТЕЛЬНО ПО ТЗ: Новая модель подписок
 class Follow(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='follower',  # Кто подписывается
+        related_name='follower',  
         verbose_name='Подписчик'
     )
     following = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='following',  # На кого подписываются
+        related_name='following',  
         verbose_name='Автор'
     )
 
     class Meta:
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
-        # РЕКОМЕНДАЦИЯ ИЗ ТЗ: Используем UniqueConstraint вместо устаревшего unique_together
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'following'],
@@ -76,4 +74,7 @@ class Follow(models.Model):
         ]
 
     def __str__(self):
-        return f'{self.user.username} подписан на {self.following.username}'
+        return (
+            f'{self.user.username} подписан '
+            f'на {self.following.username}'
+        )
