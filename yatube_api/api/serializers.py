@@ -1,18 +1,21 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
-from posts.models import Post, Group, Comment, Follow
-from django.contrib.auth import get_user_model
+
+from posts.models import Comment, Follow, Group, Post
 
 User = get_user_model()
 
 
 class GroupSerializer(serializers.ModelSerializer):
+    """Сериализатор для работы с группами."""
     class Meta:
         model = Group
         fields = ('id', 'title', 'slug', 'description')
 
 
 class PostSerializer(serializers.ModelSerializer):
+    """Сериализатор для работы с постами."""
     author = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True
@@ -24,6 +27,7 @@ class PostSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    """Сериализатор для работы с комментариями."""
     author = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True
@@ -32,10 +36,11 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('id', 'author', 'post', 'text', 'created')
-        read_only_fields = ('post',)
+        read_only_fields = ('author',)
 
 
 class FollowSerializer(serializers.ModelSerializer):
+    """Сериализатор для работы с подписками."""
     user = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True,
@@ -49,16 +54,16 @@ class FollowSerializer(serializers.ModelSerializer):
     class Meta:
         model = Follow
         fields = ('user', 'following')
-
         validators = [
             UniqueTogetherValidator(
                 queryset=Follow.objects.all(),
-                fields=['user', 'following'],
+                fields=('user', 'following'),
                 message='Вы уже подписаны на этого автора!'
             )
         ]
 
     def validate_following(self, value):
+        """Проверка, чтобы пользователь не подписался на самого себя."""
         if self.context['request'].user == value:
             raise serializers.ValidationError(
                 'Нельзя подписаться на самого себя!'
