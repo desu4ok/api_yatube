@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import Comment, Group, Post, Follow  # Добавили Follow в импорт
-
+from .models import Comment, Group, Post, Follow
 
 class PostAdmin(admin.ModelAdmin):
     list_display = ('pk', 'text', 'pub_date', 'author', 'group')
@@ -46,7 +45,6 @@ class CommentAdmin(admin.ModelAdmin):
     text_preview.short_description = 'Комментарий'
 
 
-# ОБЯЗАТЕЛЬНО ПО ТЗ: Класс управления подписками в админке
 class FollowAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'following')
     search_fields = ('user__username', 'following__username')
@@ -56,4 +54,4 @@ class FollowAdmin(admin.ModelAdmin):
 admin.site.register(Post, PostAdmin)
 admin.site.register(Group, GroupAdmin)
 admin.site.register(Comment, CommentAdmin)
-admin.site.register(Follow, FollowAdmin)  # Регистрируем подписки
+admin.site.register(Follow, FollowAdmin)
